@@ -1,8 +1,11 @@
 package dev.lampirg.letter;
 
 import dev.lampirg.letter.controller.LetterCountController;
+import dev.lampirg.letter.json.Symbol;
+import dev.lampirg.letter.json.Symbols;
 import dev.lampirg.letter.logic.LetterCounter;
 import lombok.SneakyThrows;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,7 +19,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 @WebMvcTest(LetterCountController.class)
 @DisplayName("Test LetterCountController class with LetterCounter being mocked")
@@ -37,18 +42,11 @@ public class TestController {
                     "string": "aaaaabcccc"
                 }
                 """;
-        String outputJson = """
-                {
-                    "a": 5,
-                    "c": 4,
-                    "b": 1
-                }
-                """;
         Mockito.when(letterCounter.countLetters("aaaaabcccc"))
-                .thenReturn(new LinkedHashMap<>(Map.of(
-                        'a', 5,
-                        'c', 4,
-                        'b', 1
+                .thenReturn(new Symbols(List.of(
+                        new Symbol('a', 5),
+                        new Symbol('c', 4),
+                        new Symbol('b', 1)
                 )));
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/count")
@@ -56,7 +54,12 @@ public class TestController {
                                 .content(inputJson)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(outputJson, true));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].value", Matchers.is("a")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].frequency", Matchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].value", Matchers.is("c")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].frequency", Matchers.is(4)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].value", Matchers.is("b")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].frequency", Matchers.is(1)));
     }
 
     @Test
@@ -68,20 +71,12 @@ public class TestController {
                     "string": "aaaaab\\"cccc\\""
                 }
                 """;
-        String outputJson = """
-                {
-                    "a": 5,
-                    "c": 4,
-                    "\"": 2,
-                    "b": 1
-                }
-                """;
-        Mockito.when(letterCounter.countLetters("aaaaabcccc"))
-                .thenReturn(new LinkedHashMap<>(Map.of(
-                        'a', 5,
-                        'c', 4,
-                        '\"', 2,
-                        'b', 1
+        Mockito.when(letterCounter.countLetters("aaaaab\"cccc\""))
+                .thenReturn(new Symbols(List.of(
+                        new Symbol('a', 5),
+                        new Symbol('c', 4),
+                        new Symbol('"', 2),
+                        new Symbol('b', 1)
                 )));
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/count")
@@ -89,6 +84,13 @@ public class TestController {
                                 .content(inputJson)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(outputJson));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].value", Matchers.is("a")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].frequency", Matchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].value", Matchers.is("c")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].frequency", Matchers.is(4)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].value", Matchers.is("\"")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].frequency", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].value", Matchers.is("b")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].frequency", Matchers.is(1)));;
     }
 }
