@@ -1,7 +1,9 @@
 package dev.lampirg.letter.logic;
 
+import dev.lampirg.letter.json.Symbols;
+
 import java.util.Map;
 
 public interface LetterCounter {
-    Map<Character, Integer> countLetters(String input);
+    Symbols countLetters(String input);
 }

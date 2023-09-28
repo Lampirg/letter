@@ -20,6 +20,6 @@ public class LetterCountController {
 
     @PostMapping
     public Symbols countLetters(@RequestBody Map<String, String> json) {
-        return new Symbols(letterCounter.countLetters(Objects.requireNonNull(json.get("string"))));
+        return letterCounter.countLetters(Objects.requireNonNull(json.get("string")));
     }
 }

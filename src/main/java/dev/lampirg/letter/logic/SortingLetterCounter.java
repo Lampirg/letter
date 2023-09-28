@@ -1,5 +1,7 @@
 package dev.lampirg.letter.logic;
 
+import dev.lampirg.letter.json.Symbol;
+import dev.lampirg.letter.json.Symbols;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class SortingLetterCounter implements LetterCounter {
     @Override
-    public Map<Character, Integer> countLetters(String input) {
+    public Symbols countLetters(String input) {
         return input.chars()
                 .mapToObj(ch -> (char) ch)
                 .collect(Collectors.toMap(
@@ -22,14 +24,11 @@ public class SortingLetterCounter implements LetterCounter {
                 ))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .map(entry -> new Symbol(entry.getKey(), entry.getValue()))
                 .collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                (v1, v2) -> {
-                                    throw new IllegalStateException("duplicates in entry stream");
-                                },
-                                LinkedHashMap::new
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                Symbols::new
                         )
                 );
     }
