@@ -18,11 +18,24 @@ public class TestSortingLetterCounter {
     @DisplayName("Test counting letters in string")
     void testSimpleString() {
         String input = "aaaaabcccc";
-        String expected = "\"a\": 5, \"c\": 4, \"b\": 1";
+        String expected = "a: 5, c: 4, b: 1";
         String actual = letterCounter.countLetters(input)
                 .entrySet()
                 .stream()
-                .map(entry -> String.format("\"%s\": %d", entry.getKey(), entry.getValue()))
+                .map(entry -> String.format("%s: %d", entry.getKey(), entry.getValue()))
+                .collect(Collectors.joining(", "));
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Test counting symbols in string with quotes")
+    void testStringWithQuotes() {
+        String input = "aaaaab\"cccc\"";
+        String expected = "a: 5, c: 4, \": 2, b: 1";
+        String actual = letterCounter.countLetters(input)
+                .entrySet()
+                .stream()
+                .map(entry -> String.format("%s: %d", entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining(", "));
         Assertions.assertEquals(expected, actual);
     }

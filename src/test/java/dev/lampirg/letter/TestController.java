@@ -31,7 +31,7 @@ public class TestController {
     @Test
     @DisplayName("Test controller")
     @SneakyThrows
-    void test() {
+    void testSimpleString() {
         String inputJson = """
                 {
                     "string": "aaaaabcccc"
@@ -57,5 +57,38 @@ public class TestController {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(outputJson, true));
+    }
+
+    @Test
+    @DisplayName("Test controller")
+    @SneakyThrows
+    void testStringWithQuotes() {
+        String inputJson = """
+                {
+                    "string": "aaaaab\\"cccc\\""
+                }
+                """;
+        String outputJson = """
+                {
+                    "a": 5,
+                    "c": 4,
+                    "\"": 2,
+                    "b": 1
+                }
+                """;
+        Mockito.when(letterCounter.countLetters("aaaaabcccc"))
+                .thenReturn(new LinkedHashMap<>(Map.of(
+                        'a', 5,
+                        'c', 4,
+                        '\"', 2,
+                        'b', 1
+                )));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/count")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(inputJson)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(outputJson));
     }
 }
