@@ -1,5 +1,6 @@
 package dev.lampirg.letter.controller;
 
+import dev.lampirg.letter.json.Symbols;
 import dev.lampirg.letter.logic.LetterCounter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class LetterCountController {
     }
 
     @PostMapping
-    public Map<Character, Integer> countLetters(@RequestBody Map<String, String> json) {
-        return letterCounter.countLetters(Objects.requireNonNull(json.get("string")));
+    public Symbols countLetters(@RequestBody Map<String, String> json) {
+        return new Symbols(letterCounter.countLetters(Objects.requireNonNull(json.get("string"))));
     }
 }
