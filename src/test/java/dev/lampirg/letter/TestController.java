@@ -63,7 +63,7 @@ public class TestController {
     }
 
     @Test
-    @DisplayName("Test controller")
+    @DisplayName("Test controller with quotes in input")
     @SneakyThrows
     void testStringWithQuotes() {
         String inputJson = """
@@ -89,6 +89,38 @@ public class TestController {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].value", Matchers.is("c")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].frequency", Matchers.is(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].value", Matchers.is("\"")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].frequency", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].value", Matchers.is("b")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].frequency", Matchers.is(1)));;
+    }
+
+    @Test
+    @DisplayName("Test controller with single quotes in input")
+    @SneakyThrows
+    void testStringWithSingleQuotes() {
+        String inputJson = """
+                {
+                    "string": "aaaaab'cccc'"
+                }
+                """;
+        Mockito.when(letterCounter.countLetters("aaaaab'cccc'"))
+                .thenReturn(new Symbols(List.of(
+                        new Symbol('a', 5),
+                        new Symbol('c', 4),
+                        new Symbol('\'', 2),
+                        new Symbol('b', 1)
+                )));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/count")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(inputJson)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].value", Matchers.is("a")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[0].frequency", Matchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].value", Matchers.is("c")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[1].frequency", Matchers.is(4)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].value", Matchers.is("'")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[2].frequency", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].value", Matchers.is("b")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.symbols[3].frequency", Matchers.is(1)));;

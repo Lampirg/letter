@@ -43,4 +43,18 @@ public class TestSortingLetterCounter {
         Symbols actual = letterCounter.countLetters(input);
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    @DisplayName("Test counting symbols in string with single quotes")
+    void testStringWithSingleQuotes() {
+        String input = "aaaaab'cccc'";
+        Symbols expected = new Symbols(List.of(
+                new Symbol('a', 5),
+                new Symbol('c', 4),
+                new Symbol('\'', 2),
+                new Symbol('b', 1)
+        ));
+        Symbols actual = letterCounter.countLetters(input);
+        Assertions.assertEquals(expected, actual);
+    }
 }
