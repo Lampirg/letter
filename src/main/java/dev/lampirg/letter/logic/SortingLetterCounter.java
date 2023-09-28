@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Service
 public class SortingLetterCounter implements LetterCounter {
     @Override
-    public String countLetters(String input) {
+    public Map<Character, Integer> countLetters(String input) {
         return input.chars()
                 .mapToObj(ch -> (char) ch)
                 .collect(Collectors.toMap(
@@ -22,9 +22,15 @@ public class SortingLetterCounter implements LetterCounter {
                 ))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .map(entry -> String.format("\"%s\": %d", entry.getKey(), entry.getValue()))
                 .collect(
-                        Collectors.joining(", ")
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (v1, v2) -> {
+                                    throw new IllegalStateException("duplicates in entry stream");
+                                },
+                                LinkedHashMap::new
+                        )
                 );
     }
 }

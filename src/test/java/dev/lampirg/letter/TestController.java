@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebMvcTest(LetterCountController.class)
@@ -37,16 +39,22 @@ public class TestController {
                 """;
         String outputJson = """
                 {
-                    ""a": 5, "c": 4, "b": 1"
+                    "a": 5,
+                    "c": 4,
+                    "b": 1
                 }
                 """;
         Mockito.when(letterCounter.countLetters("aaaaabcccc"))
-                .thenReturn("\"a\": 5, \"c\": 4, \"b\": 1");
+                .thenReturn(new LinkedHashMap<>(Map.of(
+                        'a', 5,
+                        'c', 4,
+                        'b', 1
+                )));
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/count")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(inputJson)
-        )
+                        MockMvcRequestBuilders.post("/count")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(inputJson)
+                )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(outputJson, true));
     }
