@@ -17,15 +17,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 @WebMvcTest(LetterCountController.class)
 @DisplayName("Test LetterCountController class with LetterCounter being mocked")
-public class TestController {
+class TestController {
 
     @MockBean
     private LetterCounter letterCounter;
